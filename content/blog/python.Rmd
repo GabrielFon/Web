@@ -9,7 +9,7 @@ description: 'awesome'
 
 ---
 
-Hello
+I have made many projects with Python as well. I learned python in two of my classes at UT. However, I have also used it outside of classwork. The following program I made uses the Gram-Schmidt algorithm to compute a vector orthonormal to two other vectors in R2, which can be then used to find approximate solutions for inconsistent systems. Of course, there exists calculators that do this, but I enjoyed making this program for my own use in linear algebra. 
 
 ```{python}
 def dot(v, u):
