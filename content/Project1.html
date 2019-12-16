@@ -1,0 +1,492 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "SDS348 Fall 2019"
+date: "9/16/2019"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    default
+---
+
+
+
+<div id="data-wrangling-and-data-exploration" class="section level2">
+<h2>Data Wrangling and Data Exploration</h2>
+<div id="instructions" class="section level3">
+<h3>Instructions</h3>
+<p>A knitted R Markdown document (as a PDF) and the raw R Markdown file (as .Rmd) should both be submitted to Canvas by 11:59pm on 10/13/2019. These two documents will be graded jointly, so they must be consistent (i.e., don’t change the R Markdown file without also updating the knitted document). Knit an html copy too, for later!</p>
+<p>I envision your written text forming something of a narrative structure around your code/output. All results presented must have corresponding code. Any answers/results/plots etc. given without the corresponding R code that generated the result will not be graded. Furthermore, all code contained in your final project document should work properly. Please do not include any extraneous code or code which produces error messages. (Code which produces warnings is acceptable, as long as you understand what the warnings mean).</p>
+</div>
+<div id="find-data" class="section level3">
+<h3>Find data:</h3>
+<p>Find two (!) datasets with one variable in common (e.g., dates, years, states, counties, countries), both with at least 50 observations (i.e., rows) in each. When combined, the resulting/final dataset must have <strong>at least 4 different variables (at least 2 numeric) in addition to the common variable</strong>.</p>
+<p>Choose as many as you would like! If you found two datasets that you like but they don’t have enough variables, find a third dataset with the same common variable and join all three.</p>
+</div>
+<div id="guidelines" class="section level3">
+<h3>Guidelines</h3>
+<ol style="list-style-type: decimal">
+<li><p>If the datasets are not tidy, you will need to reshape them so that every observation has its own row and every variable its own column. If the datasets are both already tidy, you will make them untidy with spread() and then tidy them again with gather() to demonstrate your use of the functions.</p>
+<ul>
+<li>It would be a good idea to do this before joining. For example, if you have a dataset you like with multiple measurements per year, but you want to join by year, you could average over your numeric variables to get means/year, do counts for your categoricals to get a counts/year, etc.</li>
+</ul></li>
+<li><p>Join your 2+ separate data sources into a single dataset</p>
+<ul>
+<li>You will document the type of join that you do (left/right/inner/full), including how many cases in each dataset were dropped and why you chose this particular join</li>
+</ul></li>
+<li><p>Create summary statistics</p>
+<ul>
+<li><p>Use <em>all six</em> core <code>dplyr</code> functions (filter, select, arrange, group_by, mutate, summarize) to manipulate and explore your dataset. For mutate, create a new variable that is a function of at least one other variable, preferably using a dplyr vector function (see dplyr cheatsheet).</p></li>
+<li><p>Create summary statistics (mean, sd, var, n, quantile, min, max, n_distinct, cor, etc) for each of your numeric variables after grouping by your categorical variables (either together or one-at-a-time; if you have two categorical variables, include at least one statistic based on a grouping of two categorical variables simultaneously). If you do not have any categorical variables, create one using mutate to satisfy the requirements above.</p></li>
+</ul></li>
+<li><p>Make visualizations</p>
+<ul>
+<li>If you have 5 variables (the minimum), with 2 numeric variables (the minimum), create at least two effective plots with ggplot that illustrate some of the more interesting findings that your descriptive statistics have turned up.</li>
+<li>Each plot should have at least three variables mapped to separate aesthetics</li>
+<li>At least one plot should include <code>stat=&quot;summary&quot;</code></li>
+<li>Each plot should include a supporting paragraph describing the relationships that are being visualized and any notable trends that are apparent
+<ul>
+<li>It is fine to include more, but limit yourself to 4. Plots should not be redundant! Four bad plots will get a lower grade than two good plots!</li>
+</ul></li>
+</ul></li>
+<li><p>Perform k-means clustering or PCA on your numeric variables.</p>
+<ul>
+<li><p>Include all steps as we discuss in class, including a visualization.</p></li>
+<li><p>If you don’t have at least 3 numeric variables, create dummy variables (“one-hot” encoding) using one of your categorical variables.</p></li>
+<li><p>If you want to get fancy, or can’t reasonably recode one of your categoricals, throw all your variables in and do PAM on Gower’s distance matrix</p></li>
+</ul></li>
+</ol>
+<ul>
+<li>For every step, you should document what your code does (in words) and what you see in the data. For each plot, include a description of</li>
+</ul>
+</div>
+<div id="rubric" class="section level3">
+<h3>Rubric</h3>
+<p>Prerequisite: Finding appropriate data from at least two sources per the instructions above: Failure to do this will result in a 0! You will submit a .Rmd file and a knitted document (pdf).</p>
+<div id="introduction-4-pts" class="section level4">
+<h4>0. Introduction (4 pts)</h4>
+<ul>
+<li>Write a narrative introductory paragraph (or two) describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.</li>
+</ul>
+</div>
+<div id="tidying-spreadgather-8-pts" class="section level4">
+<h4>1. Tidying: Spread/Gather (8 pts)</h4>
+<ul>
+<li>Tidy the datasets (using the <code>tidyr</code> functions <code>gather</code> and/or <code>spread</code>)</li>
+<li>If you data sets are already tidy, untidy them, retidy them.</li>
+<li>Document the process (describe in words what was done)</li>
+</ul>
+</div>
+<div id="joiningmerging-8-pts" class="section level4">
+<h4>2. Joining/Merging (8 pts)</h4>
+<ul>
+<li>Join your datasets into one using a <code>dplyr</code> join function</li>
+<li>If you have multiple observations on the joining variable in either dataset, fix this by collapsing via summarize</li>
+<li>Discuss the process in words, including why you chose the join you did</li>
+<li>Discuss which cases were dropped, if any, and potential problems with this</li>
+</ul>
+</div>
+<div id="wrangling-40-pts" class="section level4">
+<h4>3. Wrangling (40 pts)</h4>
+<ul>
+<li>Use all six core <code>dplyr</code> functions in the service of generating summary statistics (18 pts)
+<ul>
+<li>Use mutate to generate a variable that is a function of at least one other variable</li>
+</ul></li>
+<li>Compute at least 10 different summary statistics using summarize and summarize with group_by (18 pts)
+<ul>
+<li>At least 5 of these should group by a categorical variable. Create one by dichotomizing a numeric if necessary</li>
+<li>If applicable, at least 1 of these 5 should group by two categorical variables</li>
+</ul></li>
+<li>Summarize/discuss all results in no more than two paragraphs (4 pts)</li>
+</ul>
+</div>
+<div id="visualizing-30-pts" class="section level4">
+<h4>4. Visualizing (30 pts)</h4>
+<ul>
+<li><p>Create two effective, polished plots with ggplot</p>
+<ul>
+<li>Each plot should map 3 of your variables to aesthetics</li>
+<li>Each plot should have a title and clean labeling for all mappings</li>
+<li>Change at least one default theme element and color for at least one mapping per plot</li>
+<li>For at least one plot, add more tick marks (x, y, or both) than are given by default</li>
+<li>For at least one plot, use the stat=“summary” function</li>
+<li>Supporting paragraph or two (for each plot) describing the relationships/trends that are apparent</li>
+</ul></li>
+</ul>
+</div>
+<div id="dimensionality-reduction-20-pts" class="section level4">
+<h4>5. Dimensionality Reduction (20 pts)</h4>
+<ul>
+<li><p>Either k-means clustering or PCA (inclusive “or”) should be performed on at least three numeric variables in your dataset</p>
+<ul>
+<li>All relevant steps discussed in class should be included/reported</li>
+<li>A visualization of the clusters or the first few principal components (using ggplot2)</li>
+<li>Supporting paragraph or two describing results found</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="where-do-i-find-data" class="section level3">
+<h3>Where do I find data?</h3>
+<p>OK, brace yourself!</p>
+<p>You can choose ANY datasets you want that meet the above criteria for variables and observations. I’m just sitting here but off the top of my head, if you are into amusement parks, you could look at amusement-park variables, including visits, and how they are impacted by weather. If you are interested in Game of Thrones, you could look at how the frequency of mentions of character names (plus other character variables) and the frequency of baby names in the US…You could even take your old Biostats data and merge in new data (e.g., based on a Google forms timestamp).</p>
+<p>You can make it as serious as you want, or not, but keep in mind that you will be incorporating this project into a portfolio webpage for your final in this course, so choose something that really reflects who you are, or something that you feel will advance you in the direction you hope to move career-wise, or something that you think is really neat. On the flip side, regardless of what you pick, you will be performing all the same tasks, so it doesn’t end up being that big of a deal.</p>
+<p>If you are totally clueless and have no direction at all, log into the server and type</p>
+<pre class="r"><code>data(package = .packages(all.available = TRUE))</code></pre>
+<p>This will print out a list of <strong>ALL datasets in ALL packages</strong> installed on the server (a ton)! Scroll until your eyes bleed! Actually, do not scroll that much… To start with something more manageable, just run the command on your own computer, or just run <code>data()</code> to bring up the datasets in your current environment. To read more about a dataset, do <code>?packagename::datasetname</code>.</p>
+<p>If it is easier for you, and in case you don’t have many packages installed, a list of R datasets from a few common packages (also downloadable in CSV format) is given at the following website: <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html" class="uri">https://vincentarelbundock.github.io/Rdatasets/datasets.html</a></p>
+<ul>
+<li><p>A good package to download for fun/relevant data is <code>fivethiryeight</code>. Just run <code>install.packages(&quot;fivethirtyeight&quot;), load the packages with</code>library(fivethirtyeight)<code>, run</code>data()`, and then scroll down to view the datasets. Here is an online list of all 127 datasets (with links to the 538 articles). Lots of sports, politics, current events, etc.</p></li>
+<li><p>If you have already started to specialize (e.g., ecology, epidemiology) you might look at discipline-specific R packages (vegan, epi, respectively). We will be using some tools from these packages later in the course, but they come with lots of data too, which you can explore according to the directions above</p></li>
+<li><p>However, you <em>emphatically DO NOT</em> have to use datasets available via R packages! In fact, I would much prefer it if you found the data from completely separate sources and brought them together (a much more realistic experience in the real world)! You can even reuse data from your SDS328M project, provided it shares a variable in common with other data which allows you to merge the two together (e.g., if you still had the timestamp, you could look up the weather that day: <a href="https://www.wunderground.com/history/" class="uri">https://www.wunderground.com/history/</a>). If you work in a research lab or have access to old data, you could potentially merge it with new data from your lab!</p></li>
+<li><p>Here is a curated list of interesting datasets (read-only spreadsheet format): <a href="https://docs.google.com/spreadsheets/d/1wZhPLMCHKJvwOkP4juclhjFgqIY8fQFMemwKL2c64vk/edit" class="uri">https://docs.google.com/spreadsheets/d/1wZhPLMCHKJvwOkP4juclhjFgqIY8fQFMemwKL2c64vk/edit</a></p></li>
+<li><p>Here is another great compilation of datasets: <a href="https://github.com/rfordatascience/tidytuesday" class="uri">https://github.com/rfordatascience/tidytuesday</a></p></li>
+<li><p>Here is the UCI Machine Learning Repository: <a href="https://archive.ics.uci.edu/ml/index.php" class="uri">https://archive.ics.uci.edu/ml/index.php</a></p>
+<ul>
+<li>See also <a href="https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research#Biological_data" class="uri">https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research#Biological_data</a></li>
+</ul></li>
+<li><p>Here is another good general place to look: <a href="https://www.kaggle.com/datasets" class="uri">https://www.kaggle.com/datasets</a></p></li>
+<li><p>To help narrow your search down or to see interesting variable ideas, check out <a href="https://www.tylervigen.com/spurious-correlations" class="uri">https://www.tylervigen.com/spurious-correlations</a>. This is the spurious correlations website, and it is fun, but if you look at the bottom of each plot you will see sources for the data. This is a good place to find very general data (or at least get a sense of where you can scrape data together from)!</p></li>
+<li><p>If you are interested in medical data, check out www.countyhealthrankings.org</p></li>
+<li><p>If you are interested in scraping UT data, they make <em>loads</em> of data public (e.g., beyond just professor CVs and syllabi). Check out all the data that is available in the statistical handbooks: <a href="https://reports.utexas.edu/statistical-handbook" class="uri">https://reports.utexas.edu/statistical-handbook</a></p></li>
+</ul>
+<div id="broader-data-sources" class="section level5">
+<h5>Broader data sources:</h5>
+<p><a href="www.data.gov">Data.gov</a> 186,000+ datasets!</p>
+<p><a href="Social%20Explorer">Social Explorer</a> is a nice interface to Census and American Community Survey data (more user-friendly than the government sites). May need to sign up for a free trial.</p>
+<p><a href="www.bls.gov">U.S. Bureau of Labor Statistics</a></p>
+<p><a href="www.census.gov">U.S. Census Bureau</a></p>
+<p><a href="www.gapminder.org/data">Gapminder</a>, data about the world.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.2.1     ✓ purrr   0.3.3
+## ✓ tibble  2.1.3     ✓ dplyr   0.8.3
+## ✓ tidyr   1.0.0     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggplot2)
+usage0 &lt;- read.csv(&quot;./usage2.csv&quot;)
+usage1500 &lt;- read.csv(&quot;./usage1500.csv&quot;)
+usage1695 &lt;- read.csv(&quot;./usage1695.csv&quot;)
+usage1875 &lt;- read.csv(&quot;./usage1875.csv&quot;)
+pokemon &lt;- read.csv(&quot;./pokemon.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>These are the datasets I will be using for this project. It took me a while to decide what datasets to chose that were meaningful to me. Originally, I planned on working with something related to biology, but the datasets that I looked at did not have many variables in common. Even if they were measuring the same thing, such as leaf length, different datasets measure different species or molecules that have different properties. So, I decided to look at Pokémon, since I knew there was a dataset available from class and I am familiar with other datasets as well.</p>
+<p>The dataset I chose comes from smogon.com, which is a site for competitive Pokémon battling where people can simulate battles against each other, discuss strategies, etc. They have their own battle simulator, known as “Pokémon Showdown!” which is where they get data from hundreds of thousands of games played. Because of the sheer number of Pokémon, players can chose to battle in different “tiers” where only certain Pokémon are allowed. The tiers are based on the usage of each Pokémon, that is, how often they are chosen in battle. To keep things simpler, I am only looking at the most popular tier, called “Overused” or “OU”, where a majority of Pokémon are allowed, bar a few powerful legendaries. The data here are divided by elo, so I had to obtain four different sets of data from Smogon. Also, because newer Pokémon have been released, they are missing from the dataset we saw in class, which will not be considered in this project. The usage variable is the percentage of games one is found, whereas raw is the total number of games. The data is complied from one month’s worth of games. The elo variable is the rank of the players the statistics come from.</p>
+</div>
+<div id="tidying" class="section level3">
+<h3>Tidying</h3>
+<p>Although there are several variables for each condition, the datset is already tidy. the “real” statistic shows only the times when a Pokémon is sent out in battle, but doesn’t actually have to fight. It is a separate statistic, albeit a subset of the unweighed usage (it can be higher than unweighted for stronger Pokémon). However, I will not be using that statistic as it is an unecessary restriction.</p>
+<pre class="r"><code>uwider &lt;- usage0 %&gt;% separate(usage_weighed, into = c(&quot;usage&quot;, &quot;weighed&quot;)) %&gt;% pivot_wider(names_from = &quot;Name&quot;, values_from = &quot;usage&quot;)</code></pre>
+<pre><code>## Warning: Expected 2 pieces. Additional pieces discarded in 898 rows [1, 2, 3, 4,
+## 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].</code></pre>
+<pre class="r"><code>ulonger &lt;- uwider %&gt;% pivot_longer(8:905, names_to = &quot;Pokemon&quot;, values_to = &quot;usage&quot;) %&gt;% na.omit() %&gt;% unite(&quot;usage_weighed&quot;, usage, weighed, sep=&quot;.&quot;)
+
+head(ulonger)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##       X usage_weighed raw_unweighed usage_unweighed raw_real usage_real   elo
+##   &lt;int&gt; &lt;chr&gt;                 &lt;int&gt; &lt;fct&gt;              &lt;int&gt; &lt;fct&gt;      &lt;int&gt;
+## 1     1 27.93               1078878 27.93%            924182 31.18%         0
+## 2     2 16.11                622497 16.11%            528861 17.84%         0
+## 3     3 16.10                622135 16.10%            450394 15.19%         0
+## 4     4 14.40                556308 14.40%            441526 14.89%         0
+## 5     5 13.44                519057 13.44%            425595 14.36%         0
+## 6     6 11.93                460966 11.93%            365692 12.34%         0
+## # … with 1 more variable: Pokemon &lt;chr&gt;</code></pre>
+<pre class="r"><code>usage0 &lt;- usage0 %&gt;% select(-raw_real, -usage_real, -X)
+usage1500 &lt;- usage1500 %&gt;% select(-raw_real, -usage_real, -X)
+usage1695 &lt;- usage1695 %&gt;% select(-raw_real, -usage_real, -X)
+usage1875 &lt;- usage1875 %&gt;% select(-raw_real, -usage_real, -X)</code></pre>
+<p>Here I untidied the dataset using pivot wider and separate to demonstrate how to tidy it back up. na omit here is necessary due to the large number of NAs generated by the pivot wider function, which contained several NAs for each Pokémon. Unite brings the separated columns back together, which requires a sep specifier, which I chose to be “.” since the numbers were originally decimals. I also changed the percentages to numeric variables, since there was no way to work with them as characters. This took a considerable amount of time to work out, but eventually I managed to do it. However, I decided to do it after joining the datasets.</p>
+</div>
+<div id="joining-datasets" class="section level3">
+<h3>Joining Datasets</h3>
+<pre class="r"><code>pokestat &lt;- full_join(usage0, usage1500, by=c(&quot;Name&quot;,&quot;usage_weighed&quot;, &quot;raw_unweighed&quot;, &quot;elo&quot;, &quot;usage_unweighed&quot;)) %&gt;% full_join(usage1695, by=c(&quot;Name&quot;,&quot;usage_weighed&quot;, &quot;raw_unweighed&quot;, &quot;elo&quot;, &quot;usage_unweighed&quot;)) %&gt;% full_join(usage1875, by=c(&quot;Name&quot;,&quot;usage_weighed&quot;, &quot;raw_unweighed&quot;, &quot;elo&quot;, &quot;usage_unweighed&quot;)) %&gt;% full_join(pokemon)</code></pre>
+<pre><code>## Warning: Column `Name` joining factors with different levels, coercing to
+## character vector</code></pre>
+<pre><code>## Warning: Column `usage_weighed` joining factors with different levels, coercing
+## to character vector</code></pre>
+<pre><code>## Warning: Column `Name` joining character vector and factor, coercing into
+## character vector</code></pre>
+<pre><code>## Warning: Column `usage_weighed` joining character vector and factor, coercing
+## into character vector</code></pre>
+<pre><code>## Warning: Column `Name` joining character vector and factor, coercing into
+## character vector</code></pre>
+<pre><code>## Warning: Column `usage_weighed` joining character vector and factor, coercing
+## into character vector</code></pre>
+<pre><code>## Joining, by = &quot;Name&quot;</code></pre>
+<pre><code>## Warning: Column `Name` joining character vector and factor, coercing into
+## character vector</code></pre>
+<pre class="r"><code>pokestat &lt;- pokestat[!is.na(pokestat$Total), ]
+pokestat &lt;- pokestat[!is.na(pokestat$usage_weighed), ]
+
+a1 &lt;- pokestat %&gt;% separate(usage_weighed, into=c(&quot;usage&quot;,&quot;weighed&quot;))</code></pre>
+<pre><code>## Warning: Expected 2 pieces. Additional pieces discarded in 2995 rows [1, 2, 3,
+## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].</code></pre>
+<pre class="r"><code>a1 &lt;- a1%&gt;%unite(&quot;usage_weighed&quot;, usage, weighed, sep=&quot;.&quot;)
+a1$usage_weighed &lt;- as.numeric(as.character(a1$usage_weighed))
+
+a1 &lt;- a1 %&gt;% separate(usage_unweighed, into=c(&quot;usage&quot;,&quot;unweighed&quot;))</code></pre>
+<pre><code>## Warning: Expected 2 pieces. Additional pieces discarded in 2995 rows [1, 2, 3,
+## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].</code></pre>
+<pre class="r"><code>a1 &lt;- a1%&gt;%unite(&quot;usage_unweighed&quot;, usage, unweighed, sep=&quot;.&quot;)
+a1$usage_unweighed &lt;- as.numeric(as.character(a1$usage_unweighed))
+pokestat &lt;- a1</code></pre>
+</div>
+<div id="wrangling" class="section level3">
+<h3>Wrangling</h3>
+<pre class="r"><code>pokestat %&gt;% select(Name, Speed) %&gt;% mutate(minSpeed = floor((2*Speed + 5)*0.9)) %&gt;% mutate(maxSpeed = floor((2*Speed + 5 + (252/4) + 31) * 1.1 )) %&gt;% head()</code></pre>
+<pre><code>##         Name Speed minSpeed maxSpeed
+## 1 Ferrothorn    20       40      152
+## 2    Heatran    77      143      278
+## 3  RotomWash    86      159      298
+## 4   Garchomp   102      188      333
+## 5    Gliscor    95      175      317
+## 6  Serperior   113      207      357</code></pre>
+<p>The formulas here aren’t really important, but it is nice to see that they work. they represent the stats at lv100 from min to max.</p>
+<pre class="r"><code>pokestat &lt;- pokestat %&gt;% rename(&quot;Type1&quot; = &#39;Type.1&#39;, &quot;Type2&quot; = &#39;Type.2&#39;, &quot;dexNo&quot;=&#39;X.&#39;)
+
+pokestat %&gt;% group_by(Type1, Type2) %&gt;% filter(str_detect(Name, &quot;Mega&quot;)) %&gt;% summarize(mean=mean(Total), usage=mean(raw_unweighed)) %&gt;% arrange(desc(mean)) %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 x 4
+## # Groups:   Type1 [5]
+##   Type1  Type2    mean   usage
+##   &lt;fct&gt;  &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Dragon Ground    700  69808 
+## 2 Dragon Psychic   700  49214.
+## 3 Rock   Dark      700 150489 
+## 4 Water  Ground    635 215105 
+## 5 Grass  Dragon    630  43233 
+## 6 Steel  &quot;&quot;        630  36078</code></pre>
+<pre class="r"><code>#Mega only
+
+pokestat %&gt;% group_by(Type1, Type2) %&gt;% summarize(mean=mean(Total), usage=mean(raw_unweighed), usagesd = sd(raw_unweighed)) %&gt;% arrange(desc(mean))</code></pre>
+<pre><code>## # A tibble: 146 x 5
+## # Groups:   Type1 [18]
+##    Type1    Type2    mean   usage usagesd
+##    &lt;fct&gt;    &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Dragon   Ice       680 101037   89575.
+##  2 Dragon   Psychic   650  49829.  14632.
+##  3 Rock     Dark      650 189408.  41606.
+##  4 Grass    Dragon    630  43233       0 
+##  5 Electric Dragon    610  12863       0 
+##  6 Fire     Steel     600 519057       0 
+##  7 Fire     Water     600  46222       0 
+##  8 Psychic  Fire      600 238245       0 
+##  9 Psychic  Grass     600  13216       0 
+## 10 Dragon   Fairy     590  30637       0 
+## # … with 136 more rows</code></pre>
+<pre class="r"><code>#Overall
+
+pokestat %&gt;% group_by(Type1, Type2) %&gt;% filter(Legendary == T) %&gt;% summarize(mean=mean(Total), usage=mean(raw_unweighed)) %&gt;% arrange(desc(mean)) %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 x 4
+## # Groups:   Type1 [4]
+##   Type1  Type2    mean    usage
+##   &lt;fct&gt;  &lt;fct&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1 Dragon Ice       680  101037 
+## 2 Normal &quot;&quot;        670    4120 
+## 3 Dragon Psychic   650   49829.
+## 4 Fire   Steel     600  519057 
+## 5 Fire   Water     600   46222 
+## 6 Ground Flying    600 1078878</code></pre>
+<pre class="r"><code>#Legendary Only
+
+pokestat %&gt;% group_by(Generation) %&gt;% summarize(meanTotal=mean(Total), usage=mean(raw_unweighed))</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   Generation meanTotal  usage
+##        &lt;int&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+## 1          1      418. 20414.
+## 2          2      413. 18597.
+## 3          3      414. 16803.
+## 4          4      443. 32955.
+## 5          5      425. 28454.
+## 6          6      416. 14842.</code></pre>
+<pre class="r"><code>#total and usage by generation
+
+pokestat %&gt;% group_by(Generation) %&gt;% summarize(meanSpeed=mean(Speed), meanAttack=mean(Attack), meanHP=mean(HP), usage=mean(raw_unweighed), usagesd = sd(raw_unweighed))</code></pre>
+<pre><code>## # A tibble: 6 x 6
+##   Generation meanSpeed meanAttack meanHP  usage usagesd
+##        &lt;int&gt;     &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+## 1          1      70.9       74.8   64.9 20414.  51127.
+## 2          2      61.1       71.3   70.5 18597.  42473.
+## 3          3      62.7       75.9   65.1 16803.  39968.
+## 4          4      68.4       80.4   70.3 32955.  85113.
+## 5          5      66.6       80.6   70.4 28454. 103908.
+## 6          6      64.5       70.6   66.3 14842.  47962.</code></pre>
+<pre class="r"><code>#some stats by generation and usage
+
+pokestat %&gt;% select(dexNo, Name, usage_weighed) %&gt;% arrange(desc(usage_weighed)) %&gt;% head()</code></pre>
+<pre><code>##   dexNo            Name usage_weighed
+## 1   645 LandorusTherian         43.89
+## 2   645 LandorusTherian         42.49
+## 3   645 LandorusTherian         34.62
+## 4   598      Ferrothorn         20.65
+## 5   485         Heatran         19.19
+## 6   641 TornadusTherian         18.92</code></pre>
+<pre class="r"><code>#Pokedex number by usage
+
+pokestat %&gt;% select(-Generation, -Type1, -Type2, -Legendary, -Name, -dexNo, -elo) %&gt;% cor()</code></pre>
+<pre><code>##                 usage_weighed raw_unweighed usage_unweighed     Total        HP
+## usage_weighed       1.0000000     0.9618813       0.9618660 0.2917131 0.1909014
+## raw_unweighed       0.9618813     1.0000000       0.9999987 0.3546921 0.2229276
+## usage_unweighed     0.9618660     0.9999987       1.0000000 0.3548763 0.2230430
+## Total               0.2917131     0.3546921       0.3548763 1.0000000 0.6007911
+## HP                  0.1909014     0.2229276       0.2230430 0.6007911 1.0000000
+## Attack              0.2016135     0.2428671       0.2429816 0.7017421 0.3997873
+## Defense             0.1863507     0.2192757       0.2193671 0.6130115 0.2024178
+## Sp..Atk             0.1853995     0.2278553       0.2279457 0.6972745 0.3216720
+## Sp..Def             0.2014053     0.2478226       0.2479677 0.7120890 0.3448215
+## Speed               0.1588236     0.2065116       0.2066698 0.5245497 0.1308047
+##                    Attack     Defense   Sp..Atk   Sp..Def       Speed
+## usage_weighed   0.2016135  0.18635066 0.1853995 0.2014053  0.15882356
+## raw_unweighed   0.2428671  0.21927568 0.2278553 0.2478226  0.20651165
+## usage_unweighed 0.2429816  0.21936708 0.2279457 0.2479677  0.20666981
+## Total           0.7017421  0.61301151 0.6972745 0.7120890  0.52454969
+## HP              0.3997873  0.20241777 0.3216720 0.3448215  0.13080472
+## Attack          1.0000000  0.44169147 0.2739434 0.2253284  0.31182738
+## Defense         0.4416915  1.00000000 0.1985524 0.4848671 -0.03968431
+## Sp..Atk         0.2739434  0.19855243 1.0000000 0.4933602  0.40793438
+## Sp..Def         0.2253284  0.48486707 0.4933602 1.0000000  0.22255600
+## Speed           0.3118274 -0.03968431 0.4079344 0.2225560  1.00000000</code></pre>
+<pre class="r"><code>#Correlation matrix</code></pre>
+</div>
+<div id="visualizing" class="section level3">
+<h3>Visualizing</h3>
+<pre class="r"><code>pokestat %&gt;% group_by(Generation) %&gt;% ggplot(aes(x=Generation, y=raw_unweighed, fill=(Type1)))+geom_bar(stat=&quot;summary&quot;) +ggtitle(&quot;Usage Distribution by Generation&quot;)+labs(x=&quot;Generation&quot;, y=&quot;Unweighted Usage&quot;) + theme_dark()+theme(legend.position = &quot;bottom&quot;) + scale_x_continuous(&quot;Generation&quot;, 1:6)</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-7-1.png" width="672" /> This graph showing the mean unweighted usage for each generation of Pokémon. Interestingly, one would expect that newer Pokémon would be stronger than older Pokémon, but this is not actually the case here. I also added a fill color representing the Type1. It can be used to show the proportion of pokemon of each Type introduced in each generation.</p>
+<pre class="r"><code>pokestat %&gt;% ggplot(aes(x=Type1, y=Type2, color=(Total)))+geom_point()+ggtitle(&quot;Base Stat Total Distributed by Type&quot;)+labs(x=&quot;Type 1&quot;, y=&quot;Type 2&quot;)+ theme(axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-8-1.png" width="672" /> This graph shows a Base Stat Total Distirbution by Type. It is interesting to note a few things here: the darker dots are lower in stat total, which can be seen on the left edge and the top edge. This shows that bug type Pokémon in particular tend to have the lowest stats. Additionally, Pokémon with only one type have lower stats as well (NA at the top). This makes sense because the unevolved Pokémon usually only have one type and are weaker in general as well. Some of the stronger types include Dragon, Psychic and Fire.</p>
+<pre class="r"><code>pokestat %&gt;% ggplot(aes(x=Type1, y=Type2, color=(usage_weighed)))+geom_point()+ggtitle(&quot;Weighted Usage Distributed by Type&quot;)+labs(x=&quot;Type 1&quot;, y=&quot;Type 2&quot;)+ theme(axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-9-1.png" width="672" /> This plot is similar to the previous one. It shows the same thing but for weighted usage rather than type. It is interesting to note that there is not much variation between each type combination. This is probably best explained by the fact that more diverse teams are better than ones centralized on a certain type, as they cover more weaknesses. Because of this, most types are represented fairly equally.</p>
+</div>
+<div id="principal-component-analysis" class="section level3">
+<h3>Principal Component Analysis</h3>
+<pre class="r"><code>b1 &lt;- pokestat %&gt;% select(-Generation, -dexNo) %&gt;% select_if(is.numeric) %&gt;% scale()
+rownames(b1) &lt;- pokestat$Name
+b2&lt;-princomp(b1)
+b2 %&gt;% summary(loadings=T)</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1    Comp.2    Comp.3    Comp.4     Comp.5
+## Standard deviation     2.0832787 1.4545330 1.0656747 0.9997940 0.93071689
+## Proportion of Variance 0.3946818 0.1923975 0.1032765 0.0909020 0.07877484
+## Cumulative Proportion  0.3946818 0.5870793 0.6903559 0.7812578 0.86003269
+##                            Comp.6     Comp.7     Comp.8      Comp.9
+## Standard deviation     0.87320835 0.67056852 0.52837332 0.218613187
+## Proportion of Variance 0.06934068 0.04089203 0.02538833 0.004346153
+## Cumulative Proportion  0.92937337 0.97026540 0.99565373 0.999999885
+##                             Comp.10      Comp.11
+## Standard deviation     1.125294e-03 6.817765e-08
+## Proportion of Variance 1.151555e-07 4.227040e-16
+## Cumulative Proportion  1.000000e+00 1.000000e+00
+## 
+## Loadings:
+##                 Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7 Comp.8 Comp.9
+## usage_weighed    0.337  0.473                                            0.813
+## raw_unweighed    0.362  0.447                                           -0.411
+## usage_unweighed  0.362  0.447                                           -0.411
+## elo                                  -1.000                                   
+## Total            0.422 -0.325                                                 
+## HP               0.262 -0.196               -0.320  0.801 -0.198 -0.259       
+## Attack           0.292 -0.222  0.110        -0.652 -0.259  0.206  0.514       
+## Defense          0.257 -0.195  0.612               -0.387        -0.554       
+## Sp..Atk          0.292 -0.249 -0.340         0.361  0.120  0.732              
+## Sp..Def          0.306 -0.251  0.136         0.564        -0.441  0.516       
+## Speed            0.218 -0.139 -0.689        -0.125 -0.348 -0.433 -0.296       
+##                 Comp.10 Comp.11
+## usage_weighed                  
+## raw_unweighed   -0.707         
+## usage_unweighed  0.707         
+## elo                            
+## Total                    0.843 
+## HP                      -0.193 
+## Attack                  -0.234 
+## Defense                 -0.238 
+## Sp..Atk                 -0.224 
+## Sp..Def                 -0.207 
+## Speed                   -0.216</code></pre>
+<pre class="r"><code>eigen &lt;- b2$sdev^2
+varprop=round(eigen/sum(eigen),2)
+
+pokedf&lt;-data.frame(PC1=b2$scores[,1], PC2=b2$scores[,2])
+ggplot(pokedf,aes(PC1, PC2))+geom_point()</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>Name&lt;-pokestat$Name
+b2$scores%&gt;%as.data.frame%&gt;%cbind(Name,.)%&gt;%top_n(3,Comp.1)</code></pre>
+<pre><code>##              Name   Comp.1   Comp.2      Comp.3     Comp.4     Comp.5
+## 1 LandorusTherian 18.76381 19.27078 -0.10890797 -0.1123559 -0.6842169
+## 2 LandorusTherian 20.18536 21.26830 -0.04934305 -0.3416128 -0.6362445
+## 3 LandorusTherian 19.97144 20.96885 -0.05860094 -0.5886461 -0.6425587
+##        Comp.6   Comp.7    Comp.8     Comp.9      Comp.10       Comp.11
+## 1 -0.11457379 1.140449 0.7423959 0.01405054 0.0003193617 -1.762201e-13
+## 2 -0.05885511 1.243164 0.7887475 3.44209074 0.0004529702 -1.762201e-13
+## 3 -0.06712102 1.227376 0.7816017 2.92546704 0.0004327815 -1.762201e-13</code></pre>
+<pre class="r"><code>b2$scores%&gt;%as.data.frame%&gt;%cbind(Name,.)%&gt;%top_n(3,wt=desc(Comp.1))</code></pre>
+<pre><code>##      Name    Comp.1   Comp.2     Comp.3     Comp.4    Comp.5        Comp.6
+## 1 Sunkern -3.597559 2.090274 0.05418448  1.7119629 0.2316376 -0.0014219209
+## 2 Sunkern -3.592039 2.106192 0.05230737 -0.3051553 0.2383043 -0.0003548760
+## 3 Sunkern -3.591322 2.108261 0.05206335 -0.5673806 0.2391710 -0.0002161601
+##      Comp.7    Comp.8      Comp.9       Comp.10      Comp.11
+## 1 0.2326595 0.1721835 -0.07372501 -0.0005529483 3.112510e-13
+## 2 0.2306871 0.1711411 -0.06588003 -0.0005530232 3.116951e-13
+## 3 0.2304307 0.1710056 -0.06486018 -0.0005530330 3.116951e-13</code></pre>
+<pre class="r"><code>b2$scores%&gt;%as.data.frame%&gt;%cbind(Name,.)%&gt;%top_n(3,wt=Comp.2) </code></pre>
+<pre><code>##              Name   Comp.1   Comp.2      Comp.3     Comp.4     Comp.5
+## 1 LandorusTherian 18.76381 19.27078 -0.10890797 -0.1123559 -0.6842169
+## 2 LandorusTherian 20.18536 21.26830 -0.04934305 -0.3416128 -0.6362445
+## 3 LandorusTherian 19.97144 20.96885 -0.05860094 -0.5886461 -0.6425587
+##        Comp.6   Comp.7    Comp.8     Comp.9      Comp.10       Comp.11
+## 1 -0.11457379 1.140449 0.7423959 0.01405054 0.0003193617 -1.762201e-13
+## 2 -0.05885511 1.243164 0.7887475 3.44209074 0.0004529702 -1.762201e-13
+## 3 -0.06712102 1.227376 0.7816017 2.92546704 0.0004327815 -1.762201e-13</code></pre>
+<pre class="r"><code>b2$scores%&gt;%as.data.frame%&gt;%cbind(Name,.)%&gt;%top_n(3,wt=desc(Comp.2))</code></pre>
+<pre><code>##        Name   Comp.1    Comp.2    Comp.3     Comp.4    Comp.5     Comp.6
+## 1 Regigigas 3.095239 -2.915797 0.3776160  1.6863154 -1.490895 -0.2247890
+## 2 Regigigas 3.089215 -2.915030 0.3749787 -0.5933127 -1.483768 -0.2240629
+## 3 Regigigas 3.091410 -2.910968 0.3748180 -0.8353313 -1.482917 -0.2238749
+##       Comp.7    Comp.8    Comp.9      Comp.10       Comp.11
+## 1 -0.7028589 0.5912672 0.1721918 0.0009458411 -5.226375e-13
+## 2 -0.7059764 0.5896882 0.1514815 0.0009446033 -5.221934e-13
+## 3 -0.7061020 0.5896132 0.1561198 0.0009447384 -5.221934e-13</code></pre>
+<pre class="r"><code>b2$loadings[1:7,1:2]%&gt;%as.data.frame%&gt;%rownames_to_column%&gt;%
+ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+ geom_vline(aes(xintercept=0),lty=2)+ylab(&quot;PC2&quot;)+xlab(&quot;PC1&quot;)+
+ geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col=&quot;red&quot;)+
+ geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname))</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Interestingly here, the base stats seem to be less correlated to usage as one may think. This suggests there may be other factors affecting the usage of certain Pokémon, and likewise that usage does not tell the strength of the Pokémon in all aspects. This is especially evident looking at the lowest in PC2, Regigigas, which has very high base stats but suffers competitively due to its detrimental ability (not considered in this project).</p>
+<pre class="r"><code>pokestat%&gt;%select(-Generation, -dexNo) %&gt;% select_if(is.numeric) %&gt;% mutate_all(function(x)log(x+1))%&gt;%
+ prcomp()-&gt;poke_pca
+summary(poke_pca)</code></pre>
+<pre><code>## Importance of components:
+##                           PC1    PC2     PC3     PC4     PC5     PC6     PC7
+## Standard deviation     3.2174 2.7377 0.54768 0.47205 0.41688 0.38064 0.32384
+## Proportion of Variance 0.5471 0.3961 0.01585 0.01178 0.00919 0.00766 0.00554
+## Cumulative Proportion  0.5471 0.9432 0.95908 0.97086 0.98005 0.98770 0.99325
+##                            PC8     PC9    PC10    PC11
+## Standard deviation     0.27614 0.20312 0.08832 0.04976
+## Proportion of Variance 0.00403 0.00218 0.00041 0.00013
+## Cumulative Proportion  0.99728 0.99946 0.99987 1.00000</code></pre>
+<pre class="r"><code>eigvals&lt;-poke_pca$sdev^2
+varprop&lt;-round(eigvals/sum(eigvals),2)
+
+results&lt;-pokestat%&gt;%as.data.frame%&gt;%
+ mutate(PC1=poke_pca$x[,1],PC2=poke_pca$x[,2])
+
+results%&gt;%ggplot(aes(PC1,PC2,color=Total, shape=Legendary))+geom_point(size=3)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>results%&gt;%ggplot(aes(PC1,PC2,color=usage_unweighed, shape=Legendary))+geom_point(size=3)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-13-2.png" width="672" /></p>
+<pre class="r"><code>results%&gt;%ggplot(aes(PC1,PC2,color=Type1, shape=Legendary))+geom_point(size=3)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-13-3.png" width="672" /></p>
+<p>So, the results here seem to suggest that PC2 is able to account for over 90 percent of the data. However, it is difficult to see which variable account for most of the variation. It seems that PC1 divides the most by Type1. Looking at the first graph, this makes sense, as despite including a variety of types, the right-hand side has more green points corresponding to Fighting, Fire, Flying and Ghost types whereas the left-hand side has more blue points corresponding to Normal, Ice, Ground and Poison types. Vertically, it can be seen clearly that both Legendary status but to a higher degree the usage divide the few points at the bottom from the rest. This is especially noticable in unweighed rather than weighed usage. This makes sense when looking at the highest for PC1 and PC2, both of which were LandorusTherian, a Pokémon that is ubiquitous in competitive play, although the reasons for such are more complex than just stats and typing. Total also divides the data verticalaly, which is to be expected as stronger Pokémon will be much more different than weaker Pokémon, even only accounting for stats. …</p>
+</div>
+</div>

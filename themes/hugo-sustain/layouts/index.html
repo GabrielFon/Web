@@ -1,0 +1,21 @@
+{{ partial "head" . }}
+  <body>
+    <div id="wrap">
+      {{ partial "header" . }}
+      <section id="about">
+        <div class="container">
+        <div class="avatar">
+          <img class="img-circle" src="{{ .Site.BaseURL }}img/{{ .Site.Params.avatar }}" alt="Responsive image">
+        </div>
+        <h3>I'm <strong>{{ .Site.Params.author }}</strong>, a Computational Biology major at UT Austin.</h3>
+        <h3>This website is intended to display some of my projects in R and python.</h3>
+        <h3>Have a look at some of them <a href="{{ .Site.BaseURL }}projects/"> here</a>.</h3>
+        <h3>For more about me, check out my academic &amp; professional <a href="resume.pdf">resume</a>.</h3>
+        <h3>If you have any questions, contact me via <a href="mailto:{{ .Site.Params.Social.Email }}">email</a>.</h3>
+        {{ partial "social.html" . }}
+        </div>
+      </section>
+    </div>
+    {{ partial "footer" . }}
+  </body>
+</html>
